@@ -1,0 +1,19 @@
+
+<h2>Choose the correct option</h2>
+<% var score = 0 %>
+<% for (var question of questions){ %>
+    <p>Q#<%= question.number %>. <%= question.statement %><br></p>
+    <input type="radio" name="opts" value="opt1"><%= question.opt1 %> <br><br>
+    <input type="radio" name="opts" value="opt2"><%= question.opt2 %> <br><br>
+    <input type="radio" name="opts" value="opt3"><%= question.opt3 %> <br><br>
+    <input type="radio" name="opts" value="opt4"><%= question.opt4 %> <br><br>
+    <!-- <script>
+        if(document.querySelector('input[name="opts"]:checked').value == question.ans) { 
+            score = score + 1
+    }
+    </script> -->
+<% } %>
+<br>
+<button type="submit" onclick="getScore()">Submit Test</button>
+<p>Score = <%= score %></p>
+

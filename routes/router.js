@@ -5,17 +5,17 @@ const signupDB = require('../model/signup');
 const Userdb = require('../model/users');
 const quizDB = require('../model/quiz');
 
-router.get('/', (req, res) => {
-    res.render('../views/home');
-});
+// router.get('/', (req, res) => {
+//     res.render('../views/home');
+// });
 
-router.get('/signup', (req, res) => {
-  res.render('../views/signup');
-});
+// router.get('/signup', (req, res) => {
+//   res.render('../views/signup');
+// });
 
-router.get('/login', (req, res) => {
-  res.render('../views/login');
-});
+// router.get('/login', (req, res) => {
+//   res.render('../views/login');
+// });
 
 router.get('/quizzes', (req, res) => {
   quizDB.find().then(quizzes => {
@@ -34,6 +34,12 @@ router.get('/quizzes', (req, res) => {
 });
 
 router.get('/quiz/:testId', (req, res) => {
+  quizDB.findOne({ "testId": req.params.testId }, (err, result) => {
+    res.send(result);
+  });
+});
+
+router.get('/question/:testId', (req, res) => {
   quizDB.findOne({ "testId": req.params.testId }, (err, result) => {
     res.send(result);
   });
@@ -182,7 +188,7 @@ router.get('/dashboard', (req, res) => {
 //     }
 //   });
 
-router.post('/login', async (req, res) =>{
+router.post('/signup', async (req, res) =>{
   const data = new signupDB({
     name: req.body.name,
     id: req.body.id,
@@ -192,7 +198,8 @@ router.post('/login', async (req, res) =>{
   });
   try{
     const user = await data.save();
-    res.render('../views/login');
+    // res.render('../views/login');
+    res.send(user);
   }
   catch(e){
     res.status(400).send({message: e.message});
@@ -206,19 +213,14 @@ router.post('/login', async (req, res) =>{
 //   });
 // });
 
-router.post('/tests', (req, res) =>{
+router.post('/login', (req, res) =>{
   
   signupDB.findOne({ "email": req.body.email, "password": req.body.password },  (err, result) => {
-    if (result){
-      res.render('../views/tests');
-    }
-    else{
-      res.render('../views/credentials');
-    }
+    res.send(result);
   });
 });
 
-router.post('/quiz', async (req, res) =>{
+router.post('/add/quiz', async (req, res) =>{
   const data = new quizDB({
     testName: req.body.testName,
     testId: req.body.testId,
@@ -233,7 +235,7 @@ router.post('/quiz', async (req, res) =>{
   });
   try{
     const user = await data.save();
-    res.send({userdata: user});
+    res.send({quizdata: user});
   }
   catch(e){
     res.status(400).send({message: e.message})
@@ -273,22 +275,40 @@ router.delete('/quiz/:testId', (req, res) => {
     res.status(200).json({ message: 'Quiz deleted'});
   });
 });
-//ghhgh
+
+// router.delete('/question/:testId', (req, res) => {
+//   quizDB.findOne({ testId: req.params.testId, number: req.body.number }).then(result => {
+//     res.send(result);
+//     res.status(200).json({ message: 'Quiz deleted'});
+//   });
+// });
+
 router.put('/question/:testId', (req, res) => {
   quizDB.findOne({ testId: req.params.testId }).then( function(result) {
     for (let i = 0; i < result.questions.length; i++ ){
-      for (let j = 0; j < req.body.questions.length; j++ ){
-        if (result.questions[i].number == req.body.questions[j].number){
+      
+        if (result.questions[i].number == req.body.number){
           result.questions.splice(i, 1);
         }
-      }
+      
     }
     result.save();
+    // res.send(result);
   }).catch( err => {
     res.status(500).json({
       Error: err.message
     });
   });
 });
+
+// router.put('/question/:testId', (req, res) => {
+//   quizDB.findOne({ testId: req.params.testId }).then( function(result) {
+//     res.send(result);
+//   }).catch( err => {
+//     res.status(500).json({
+//       Error: err.message
+//     });
+//   });
+// });
 
 module.exports = router;
